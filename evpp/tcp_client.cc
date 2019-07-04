@@ -46,7 +46,7 @@ void TCPClient::Bind(const std::string& addr/*host:port*/) {
 }
 
 void TCPClient::Connect() {
-    LOG_INFO << "remote_addr=" << remote_addr();
+    EVLOG_INFO << "remote_addr=" << remote_addr();
     auto f = [this]() {
         assert(loop_->IsInLoopThread());
         connector_.reset(new Connector(loop_, this));
@@ -62,7 +62,7 @@ void TCPClient::Disconnect() {
 }
 
 void TCPClient::DisconnectInLoop() {
-    LOG_WARN << "TCPClient::DisconnectInLoop this=" << this << " remote_addr=" << remote_addr_;
+    EVLOG_WARN << "TCPClient::DisconnectInLoop this=" << this << " remote_addr=" << remote_addr_;
     assert(loop_->IsInLoopThread());
     auto_reconnect_.store(false);
 

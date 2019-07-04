@@ -24,7 +24,7 @@ void Listener::Listen(int backlog) {
     fd_ = sock::CreateNonblockingSocket();
     if (fd_ < 0) {
         int serrno = errno;
-        LOG_FATAL << "Create a nonblocking socket failed " << strerror(serrno);
+        EVLOG_FATAL << "Create a nonblocking socket failed " << strerror(serrno);
         return;
     }
 
@@ -33,13 +33,13 @@ void Listener::Listen(int backlog) {
     int ret = ::bind(fd_, sock::sockaddr_cast(&addr), static_cast<socklen_t>(sizeof(struct sockaddr)));
     if (ret < 0) {
         int serrno = errno;
-        LOG_FATAL << "bind error :" << strerror(serrno) << " . addr=" << addr_;
+        EVLOG_FATAL << "bind error :" << strerror(serrno) << " . addr=" << addr_;
     }
 
     ret = ::listen(fd_, backlog);
     if (ret < 0) {
         int serrno = errno;
-        LOG_FATAL << "Listen failed " << strerror(serrno);
+        EVLOG_FATAL << "Listen failed " << strerror(serrno);
     }
 }
 
@@ -48,7 +48,7 @@ void Listener::Accept() {
     chan_.reset(new FdChannel(loop_, fd_, true, false));
     chan_->SetReadCallback(std::bind(&Listener::HandleAccept, this));
     loop_->RunInLoop(std::bind(&FdChannel::AttachToLoop, chan_.get()));
-    LOG_INFO << "TCPServer is running at " << addr_;
+    EVLOG_INFO << "TCPServer is running at " << addr_;
 }
 
 void Listener::HandleAccept() {
@@ -60,13 +60,13 @@ void Listener::HandleAccept() {
     if ((nfd = ::accept(fd_, sock::sockaddr_cast(&ss), &addrlen)) == -1) {
         int serrno = errno;
         if (serrno != EAGAIN && serrno != EINTR) {
-            LOG_WARN << __FUNCTION__ << " bad accept " << strerror(serrno);
+            EVLOG_WARN << __FUNCTION__ << " bad accept " << strerror(serrno);
         }
         return;
     }
 
     if (evutil_make_socket_nonblocking(nfd) < 0) {
-        LOG_ERROR << "set fd=" << nfd << " nonblocking failed.";
+        EVLOG_ERROR << "set fd=" << nfd << " nonblocking failed.";
         EVUTIL_CLOSESOCKET(nfd);
         return;
     }
@@ -75,7 +75,7 @@ void Listener::HandleAccept() {
 
     std::string raddr = sock::ToIPPort(&ss);
     if (raddr.empty()) {
-        LOG_ERROR << "sock::ToIPPort(&ss) failed.";
+        EVLOG_ERROR << "sock::ToIPPort(&ss) failed.";
         EVUTIL_CLOSESOCKET(nfd);
         return;
     }

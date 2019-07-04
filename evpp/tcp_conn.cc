@@ -120,7 +120,7 @@ void TCPConn::SendInLoop(const void* data, size_t len) {
     assert(loop_->IsInLoopThread());
 
     if (status_ == kDisconnected) {
-        LOG_WARN << "disconnected, give up writing";
+        EVLOG_WARN << "disconnected, give up writing";
         return;
     }
 
@@ -140,7 +140,7 @@ void TCPConn::SendInLoop(const void* data, size_t len) {
             int serrno = errno;
             nwritten = 0;
             if (!EVUTIL_ERR_RW_RETRIABLE(serrno)) {
-                LOG_ERROR << "SendInLoop write failed errno=" << serrno << " " << strerror(serrno);
+                EVLOG_ERROR << "SendInLoop write failed errno=" << serrno << " " << strerror(serrno);
                 if (serrno == EPIPE || serrno == ECONNRESET) {
                     write_error = true;
                 }
@@ -228,7 +228,7 @@ void TCPConn::HandleWrite() {
         int serrno = errno;
 
         if (EVUTIL_ERR_RW_RETRIABLE(serrno)) {
-            LOG_WARN << "this=" << this << " TCPConn::HandleWrite errno=" << serrno << " " << strerror(serrno);
+            EVLOG_WARN << "this=" << this << " TCPConn::HandleWrite errno=" << serrno << " " << strerror(serrno);
         } else {
             HandleError();
         }

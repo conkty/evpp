@@ -59,7 +59,7 @@ void FdChannel::AttachToLoop() {
         DLOG_TRACE << "fd=" << fd_ << " watching event " << EventsToString();
         attached_ = true;
     } else {
-        LOG_ERROR << "this=" << this << " fd=" << fd_ << " with event " << EventsToString() << " attach to event loop failed";
+        EVLOG_ERROR << "this=" << this << " fd=" << fd_ << " with event " << EventsToString() << " attach to event loop failed";
     }
 }
 
@@ -115,7 +115,7 @@ void FdChannel::DetachFromLoop() {
         attached_ = false;
         DLOG_TRACE << "fd=" << fd_ << " detach from event loop";
     } else {
-        LOG_ERROR << "DetachFromLoop this=" << this << "fd=" << fd_ << " with event " << EventsToString() << " detach from event loop failed";
+        EVLOG_ERROR << "DetachFromLoop this=" << this << "fd=" << fd_ << " with event " << EventsToString() << " detach from event loop failed";
     }
 }
 

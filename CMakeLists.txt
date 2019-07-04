@@ -86,7 +86,7 @@ message (STATUS "THRIFT_INCLUDE_DIR " ${THRIFT_INCLUDE_DIR})
 message (STATUS "THRIFT_LIBRARY " ${THRIFT_LIBRARY})
 
 add_subdirectory (evpp)
-add_subdirectory (apps)
+# add_subdirectory (apps)
 add_subdirectory (labs)
 
 if (NOT EVPP_VCPKG_BUILD)

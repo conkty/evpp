@@ -134,7 +134,7 @@ void TCPServer::HandleNewConn(evpp_socket_t sockfd,
     DLOG_TRACE << "fd=" << sockfd;
     assert(loop_->IsInLoopThread());
     if (IsStopping()) {
-        LOG_WARN << "this=" << this << " The server is at stopping status. Discard this socket fd=" << sockfd << " remote_addr=" << remote_addr;
+        EVLOG_WARN << "this=" << this << " The server is at stopping status. Discard this socket fd=" << sockfd << " remote_addr=" << remote_addr;
         EVUTIL_CLOSESOCKET(sockfd);
         return;
     }
