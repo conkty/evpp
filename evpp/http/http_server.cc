@@ -76,7 +76,7 @@ bool Server::Init(int listen_port) {
 #endif
     if (!lt.hservice->Listen(listen_port)) {
         int serrno = errno;
-        LOG_ERROR << "this=" << this << " http server listen at port " << listen_port << " failed. errno=" << serrno << " " << strerror(serrno);
+        EVLOG_ERROR << "this=" << this << " http server listen at port " << listen_port << " failed. errno=" << serrno << " " << strerror(serrno);
         lt.hservice->Stop();
         return false;
     }
@@ -108,7 +108,7 @@ bool Server::Init(const std::string& listen_ports/*"80,8080,443"*/) {
     for (auto& s : vec) {
         int i = std::atoi(s.c_str());
         if (i <= 0) {
-            LOG_ERROR << "this=" << this << " Cannot convert [" << s << "] to a integer. 'listen_ports' format wrong.";
+            EVLOG_ERROR << "this=" << this << " Cannot convert [" << s << "] to a integer. 'listen_ports' format wrong.";
             return false;
         }
         v.push_back(i);
@@ -135,7 +135,7 @@ bool Server::Start() {
     status_.store(kStarting);
     bool rc = tpool_->Start(true);
     if (!rc) {
-        LOG_ERROR << "this=" << this << " start thread pool failed.";
+        EVLOG_ERROR << "this=" << this << " start thread pool failed.";
         return false;
     }
 
@@ -151,7 +151,7 @@ bool Server::Start() {
                             EventLoopThread::Functor(),
                             http_close_fn);
         if (!rc) {
-            LOG_ERROR << "this=" << this << " start listening thread failed.";
+            EVLOG_ERROR << "this=" << this << " start listening thread failed.";
             return false;
         }
 
@@ -287,7 +287,7 @@ void Server::Dispatch(EventLoop* listening_loop,
     assert(listening_loop->IsInLoopThread());
     DLOG_TRACE << "dispatch request " << ctx->req() << " url=" << ctx->original_uri() << " in main thread. status=" << StatusToString();
     if (!IsRunning()) {
-        LOG_WARN << "The listening thread is not running, may be it is stopping now.";
+        EVLOG_WARN << "The listening thread is not running, may be it is stopping now.";
         //TODO gracefully shutdown.
         return;
     }
@@ -302,7 +302,7 @@ void Server::Dispatch(EventLoop* listening_loop,
             << " in working thread. status=" << StatusToString();
         
         if (!IsRunning()) {
-            LOG_WARN << "The listening thread is not running, may be it is stopping now.";
+            EVLOG_WARN << "The listening thread is not running, may be it is stopping now.";
             //TODO gracefully shutdown.
             return;
         }
@@ -334,7 +334,7 @@ EventLoop* Server::GetNextLoop(EventLoop* default_loop, const ContextPtr& ctx) {
     const sockaddr*  sa = evhttp_connection_get_addr(ctx->req()->evcon);
     if (sa) {
         const sockaddr_in* r = sock::sockaddr_in_cast(sa);
-        LOG_INFO << "http remote address " << sock::ToIPPort(r);
+        EVLOG_INFO << "http remote address " << sock::ToIPPort(r);
         return tpool_->GetNextLoopWithHash(r->sin_addr.s_addr);
     } else {
         uint64_t hash = std::hash<std::string>()(ctx->remote_ip());

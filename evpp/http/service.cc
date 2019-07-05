@@ -81,7 +81,7 @@ namespace evpp {
             /* 创建SSL上下文 */
             SSL_CTX *ctx = SSL_CTX_new (SSLv23_server_method ());
             if(ctx == NULL) {
-                LOG_ERROR << "SSL_CTX_new failed";
+                EVLOG_ERROR << "SSL_CTX_new failed";
                 return false;
             }
             /* 设置SSL选项 https://linux.die.net/man/3/ssl_ctx_set_options */
@@ -95,20 +95,20 @@ namespace evpp {
             /* 创建椭圆曲线加密key */
             EC_KEY *ecdh = EC_KEY_new_by_curve_name (NID_X9_62_prime256v1);
             if (ecdh == NULL) {
-                LOG_ERROR << "EC_KEY_new_by_curve_name failed";
+                EVLOG_ERROR << "EC_KEY_new_by_curve_name failed";
                 ERR_print_errors_fp(stderr);
                 return false;
             }
             /* 设置ECDH临时公钥 */
             if (1 != SSL_CTX_set_tmp_ecdh (ctx, ecdh)) {
-                LOG_ERROR << "SSL_CTX_set_tmp_ecdh failed";
+                EVLOG_ERROR << "SSL_CTX_set_tmp_ecdh failed";
                 return false;
             }
             /* 加载证书链文件(文件编码必须为PEM格式，使用Base64编码) */
             /* 此处也可使用SSL_CTX_use_certificate_file仅加载公钥证书 */
             if (1 != SSL_CTX_use_certificate_chain_file (
                             ctx, certificate_chain_file_.c_str())) {
-                LOG_ERROR << "Load certificate chain file(" 
+                EVLOG_ERROR << "Load certificate chain file(" 
                     << certificate_chain_file_.c_str() << ")failed";
                 ERR_print_errors_fp(stderr);
                 return false;
@@ -116,14 +116,14 @@ namespace evpp {
             /* 加载私钥文件 */
             if (1 != SSL_CTX_use_PrivateKey_file (
                             ctx, private_key_file_.c_str(), SSL_FILETYPE_PEM)) {
-                LOG_ERROR << "Load private key file(" 
+                EVLOG_ERROR << "Load private key file(" 
                     << private_key_file_.c_str() << ")failed";
                 ERR_print_errors_fp(stderr);
                 return false;
             }
             /* 校验私钥与证书是否匹配 */
             if (1 != SSL_CTX_check_private_key (ctx)) {
-                LOG_ERROR << "EC_KEY_new_by_curve_name failed";
+                EVLOG_ERROR << "EC_KEY_new_by_curve_name failed";
                 ERR_print_errors_fp(stderr);
                 return false;
             }
@@ -194,7 +194,7 @@ namespace evpp {
                 evconnlistener_disable(evhttp_bound_socket_get_listener(evhttp_bound_socket_));
             }
 #else
-            LOG_ERROR << "Not support!".;
+            EVLOG_ERROR << "Not support!".;
             assert(false && "Not support");
 #endif
         }
@@ -207,7 +207,7 @@ namespace evpp {
                 evconnlistener_enable(evhttp_bound_socket_get_listener(evhttp_bound_socket_));
             }
 #else
-            LOG_ERROR << "Not support!".;
+            EVLOG_ERROR << "Not support!".;
             assert(false && "Not support");
 #endif
         }
@@ -277,7 +277,7 @@ namespace evpp {
 
                 // At this time, req is probably freed by evhttp framework.
                 // So don't use req any more.
-                // LOG_TRACE << "free request " << req->uri;
+                // EVLOG_TRACE << "free request " << req->uri;
             }
 
             ContextPtr ctx;
@@ -300,7 +300,7 @@ namespace evpp {
 
                 // At this moment, this Service maybe already stopped.
                 if (!evhttp_) {
-                    LOG_WARN << "this=" << this << " Service has been stopped.";
+                    EVLOG_WARN << "this=" << this << " Service has been stopped.";
                     return;
                 }
 
@@ -322,7 +322,7 @@ namespace evpp {
                 DLOG_TRACE << "dispatch this SendReply to listening thread";
                 listen_loop_->RunInLoop(f);
             } else {
-                LOG_WARN << "this=" << this << " listening thread is going to stop. we discards this request.";
+                EVLOG_WARN << "this=" << this << " listening thread is going to stop. we discards this request.";
                 // TODO do we need do some resource recycling about the evhttp_request?
             }
         }
